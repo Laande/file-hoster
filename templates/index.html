@@ -19,9 +19,9 @@
     <ul>
         {% for folder in folders %}
             <li>
-                <a href="?folder={{ folder }}"><button class="folder-btn">{{ folder }}</button></a>
-                <button onclick="deleteFolder('{{ folder }}')" class="delete-btn">🗑</button>
-                <button onclick="showRenameFolderModal('{{ folder }}')" class="rename-btn">✏️</button>
+                <a href="?folder={{ folder.name }}"><button class="folder-btn">{{ folder.name }} ({{ folder.count }} fichiers)</button></a>
+                <button onclick="deleteFolder('{{ folder.name }}')" class="delete-btn"></button>
+                <button onclick="showRenameFolderModal('{{ folder.name }}')" class="rename-btn"></button>
             </li>
         {% endfor %}
     </ul>
@@ -40,10 +40,10 @@
     {% endif %}
 
     <div id="renameFolderModal" style="display:none;">
-        <form method="post">
+        <form id="rename-form" method="post">
             <input type="hidden" name="old_folder" id="old-folder">
             <input type="text" name="new_folder" id="new-folder" placeholder="Nouveau nom de dossier" required>
-            <button type="submit" name="rename_folder">Renommer</button>
+            <button type="submit">Renommer</button>
             <button type="button" onclick="closeRenameFolderModal()">Annuler</button>
         </form>
     </div>

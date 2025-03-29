@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, send_from_directory, jsonify
+from flask import Flask, request, render_template, send_from_directory, jsonify, url_for
 import os
 import shutil
 
@@ -26,23 +26,18 @@ def index():
             for file in files:
                 if file.filename:
                     file.save(os.path.join(folder_path, file.filename))
-
-        elif "rename_folder" in request.form:
-            old_folder = request.form["old_folder"]
-            new_folder = request.form["new_folder"].strip()
-            if new_folder:
-                old_folder_path = os.path.join(BASE_DIR, old_folder)
-                new_folder_path = os.path.join(BASE_DIR, new_folder)
-                if os.path.exists(old_folder_path):
-                    try:
-                        os.rename(old_folder_path, new_folder_path)
-                    except Exception as e:
-                        return jsonify({"success": False, "message": f"Erreur lors du renommage du dossier : {str(e)}"}), 500
     
     folders = sorted([f for f in os.listdir(BASE_DIR) if os.path.isdir(os.path.join(BASE_DIR, f))])
+    
+    folders_with_count = []
+    for folder in folders:
+        folder_path_count = os.path.join(BASE_DIR, folder)
+        file_count = len([f for f in os.listdir(folder_path_count) if os.path.isfile(os.path.join(folder_path_count, f))])
+        folders_with_count.append({"name": folder, "count": file_count})
+    
     files = sorted(os.listdir(folder_path)) if selected_folder and os.path.exists(folder_path) else []
 
-    return render_template("index.html", folders=folders, selected_folder=selected_folder, files=files)
+    return render_template("index.html", folders=folders_with_count, selected_folder=selected_folder, files=files)
 
 
 @app.route("/uploads/<folder>/<filename>")
@@ -95,5 +90,21 @@ def delete_folder():
     else:
         return jsonify({"success": False, "message": "Dossier non trouvé."})
 
+@app.route("/rename_folder", methods=["POST"])
+def rename_folder():
+    data = request.get_json()
+    old_folder = data.get("old_folder")
+    new_folder = data.get("new_folder")
+    
+    old_folder_path = os.path.join(BASE_DIR, old_folder)
+    new_folder_path = os.path.join(BASE_DIR, new_folder)
+    
+    os.rename(old_folder_path, new_folder_path)
+    return jsonify({
+        "success": True, 
+        "redirect_url": url_for('index', folder=new_folder)
+    })
+
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=9501, debug=True)
