@@ -98,10 +98,13 @@ async function loadFiles(folder) {
             const fileSize = typeof file === 'object' ? file.size : '';
             const sizeDisplay = fileSize ? ` (${fileSize})` : '';
             
+            const fileExtension = fileName.split('.').pop().toLowerCase();
+            const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension);
+            
             const fileElement = document.createElement('li');
             fileElement.innerHTML = `
                 <a href="/uploads/${encodedFolder}/${fileName}" target="_blank">${fileName}${sizeDisplay}</a>
-                <img src="/uploads/${encodedFolder}/${fileName}" width="100">
+                ${isImage ? `<img src="/uploads/${encodedFolder}/${fileName}" width="100">` : ''}
                 <button onclick="deleteFile('${folder}', '${fileName}', this.parentElement)" class="delete-btn"></button>
             `;
             document.getElementById('file-list').appendChild(fileElement);
