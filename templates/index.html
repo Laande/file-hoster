@@ -19,7 +19,7 @@
     <ul>
         {% for folder in folders %}
             <li>
-                <a href="?folder={{ folder.name }}"><button class="folder-btn">{{ folder.name }} ({{ folder.count }} fichiers)</button></a>
+                <a href="?folder={{ folder.name }}"><button class="folder-btn">{{ folder.name }} ({{ folder.count }} fichiers, {{ folder.size }})</button></a>
                 <button onclick="deleteFolder('{{ folder.name }}')" class="delete-btn"></button>
                 <button onclick="showRenameFolderModal('{{ folder.name }}')" class="rename-btn"></button>
             </li>
@@ -36,6 +36,13 @@
         </form>
 
         <ul id="file-list">
+            {% for file in files %}
+                <li>
+                    <a href="/uploads/{{ selected_folder }}/{{ file.name }}" target="_blank">{{ file.name }} ({{ file.size }})</a>
+                    <img src="/uploads/{{ selected_folder }}/{{ file.name }}" width="100">
+                    <button onclick="deleteFile('{{ selected_folder }}', '{{ file.name }}', this.parentElement)" class="delete-btn"></button>
+                </li>
+            {% endfor %}
         </ul>
     {% endif %}
 

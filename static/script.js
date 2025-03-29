@@ -86,37 +86,31 @@ async function renameFolder(oldFolder, newFolder) {
 }
 
 async function loadFiles(folder) {
-    if (loading || !folder) return;
+    if (loading) return;
 
     const encodedFolder = encodeURIComponent(folder);
-    try {
-        const response = await fetch(`/get_files?folder=${encodedFolder}&start=${start}`);
-        const data = await response.json();
+    const response = await fetch(`/get_files?folder=${encodedFolder}&start=${start}`);
+    const data = await response.json();
 
-        if (data.files && data.files.length > 0) {
-            const fileList = document.getElementById('file-list');
+    if (data.files && data.files.length > 0) {
+        data.files.forEach(file => {
+            const fileName = typeof file === 'object' ? file.name : file;
+            const fileSize = typeof file === 'object' ? file.size : '';
+            const sizeDisplay = fileSize ? ` (${fileSize})` : '';
             
-            data.files.forEach(file => {
-                const fileElement = document.createElement('li');
-                const fileExtension = file.split('.').pop().toLowerCase();
-                const isImage = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(fileExtension);
-                
-                fileElement.innerHTML = `
-                    <a href="/uploads/${encodedFolder}/${encodeURIComponent(file)}" target="_blank">${file}</a>
-                    ${isImage ? `<img src="/uploads/${encodedFolder}/${encodeURIComponent(file)}" width="100">` : ''}
-                    <button onclick="deleteFile('${folder}', '${file}', this.parentElement)" class="delete-btn"></button>
-                `;
-                fileList.appendChild(fileElement);
-            });
+            const fileElement = document.createElement('li');
+            fileElement.innerHTML = `
+                <a href="/uploads/${encodedFolder}/${fileName}" target="_blank">${fileName}${sizeDisplay}</a>
+                <img src="/uploads/${encodedFolder}/${fileName}" width="100">
+                <button onclick="deleteFile('${folder}', '${fileName}', this.parentElement)" class="delete-btn"></button>
+            `;
+            document.getElementById('file-list').appendChild(fileElement);
+        });
 
-            start += filesPerRequest;
-            
-            loadFiles(folder);
-        } else {
-            loading = true;
-        }
-    } catch (error) {
-        console.error("Erreur lors du chargement des fichiers : ", error);
+        start += filesPerRequest;
+
+        loadFiles(folder);
+    } else {
         loading = true;
     }
 }

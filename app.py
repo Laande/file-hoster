@@ -9,6 +9,24 @@ os.makedirs(BASE_DIR, exist_ok=True)
 
 FILES_PER_REQUEST = 10
 
+def get_size_format(size_bytes):
+    """Convertit les octets en format lisible (KB, MB, GB)"""
+    for unit in ['B', 'KB', 'MB', 'GB', 'TB']:
+        if size_bytes < 1024.0:
+            return f"{size_bytes:.2f} {unit}"
+        size_bytes /= 1024.0
+    return f"{size_bytes:.2f} PB"
+
+def get_folder_size(folder_path):
+    """Calcule la taille totale d'un dossier"""
+    total_size = 0
+    for dirpath, dirnames, filenames in os.walk(folder_path):
+        for f in filenames:
+            fp = os.path.join(dirpath, f)
+            if os.path.exists(fp):
+                total_size += os.path.getsize(fp)
+    return total_size
+
 @app.route("/", methods=["GET", "POST"])
 def index():
     selected_folder = request.args.get("folder", "")
@@ -33,11 +51,19 @@ def index():
     for folder in folders:
         folder_path_count = os.path.join(BASE_DIR, folder)
         file_count = len([f for f in os.listdir(folder_path_count) if os.path.isfile(os.path.join(folder_path_count, f))])
-        folders_with_count.append({"name": folder, "count": file_count})
+        folder_size = get_folder_size(folder_path_count)
+        folder_size_formatted = get_size_format(folder_size)
+        folders_with_count.append({
+            "name": folder, 
+            "count": file_count,
+            "size": folder_size_formatted
+        })
     
-    files = sorted(os.listdir(folder_path)) if selected_folder and os.path.exists(folder_path) else []
+    initial_files = []
+    if selected_folder and os.path.exists(folder_path):
+        pass
 
-    return render_template("index.html", folders=folders_with_count, selected_folder=selected_folder, files=files)
+    return render_template("index.html", folders=folders_with_count, selected_folder=selected_folder, files=initial_files)
 
 
 @app.route("/uploads/<folder>/<filename>")
@@ -55,7 +81,18 @@ def get_files():
     if os.path.exists(folder_path):
         all_files = sorted(os.listdir(folder_path))
         files_to_send = all_files[start:end]
-        return jsonify({"files": files_to_send})
+        
+        files_with_size = []
+        for file in files_to_send:
+            file_path = os.path.join(folder_path, file)
+            if os.path.isfile(file_path):
+                file_size = os.path.getsize(file_path)
+                files_with_size.append({
+                    "name": file,
+                    "size": get_size_format(file_size)
+                })
+        
+        return jsonify({"files": files_with_size})
     else:
         return jsonify({"files": []})
 
