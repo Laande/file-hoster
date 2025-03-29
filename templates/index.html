@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des fichiers</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</head>
+<body>
+    <h2>Gérer les fichiers</h2>
+
+    <form method="post">
+        <input type="text" name="new_folder" placeholder="Nom du nouveau dossier" required>
+        <button type="submit">Créer</button>
+    </form>
+
+    <h3>Dossiers existants :</h3>
+    <ul>
+        {% for folder in folders %}
+            <li>
+                <a href="?folder={{ folder }}"><button class="folder-btn">{{ folder }}</button></a>
+                <button onclick="deleteFolder('{{ folder }}')" class="delete-btn">🗑</button>
+                <button onclick="showRenameFolderModal('{{ folder }}')" class="rename-btn">✏️</button>
+            </li>
+        {% endfor %}
+    </ul>
+
+    {% if selected_folder %}
+        <h3>Contenu du dossier : {{ selected_folder }}</h3>
+
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" name="folder" value="{{ selected_folder }}">
+            <input type="file" name="files" multiple required>
+            <button type="submit">Uploader</button>
+        </form>
+
+        <ul id="file-list">
+        </ul>
+    {% endif %}
+
+    <div id="renameFolderModal" style="display:none;">
+        <form method="post">
+            <input type="hidden" name="old_folder" id="old-folder">
+            <input type="text" name="new_folder" id="new-folder" placeholder="Nouveau nom de dossier" required>
+            <button type="submit" name="rename_folder">Renommer</button>
+            <button type="button" onclick="closeRenameFolderModal()">Annuler</button>
+        </form>
+    </div>
+    <script>
+        const selectedFolder = "{{ selected_folder }}";
+    </script>
+</body>
+</html>
