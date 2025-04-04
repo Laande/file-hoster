@@ -1,25 +1,25 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des fichiers</title>
+    <title>File Hoster</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 </head>
 <body>
-    <h2>Gérer les fichiers</h2>
+    <h2>{{ translations.manage_files }}</h2>
 
     <form method="post">
-        <input type="text" name="new_folder" placeholder="Nom du nouveau dossier" required>
-        <button type="submit">Créer</button>
+        <input type="text" name="new_folder" placeholder="{{ translations.new_folder_placeholder }}" required>
+        <button type="submit">{{ translations.create }}</button>
     </form>
 
-    <h3>Dossiers existants :</h3>
+    <h3>{{ translations.existing_folders }}:</h3>
     <ul>
         {% for folder in folders %}
             <li>
-                <a href="?folder={{ folder.name }}"><button class="folder-btn">{{ folder.name }} ({{ folder.count }} fichiers, {{ folder.size }})</button></a>
+                <a href="?folder={{ folder.name }}"><button class="folder-btn">{{ folder.name }} ({{ folder.count }} {{ translations.files }}, {{ folder.size }})</button></a>
                 <button onclick="deleteFolder('{{ folder.name }}')" class="delete-btn"></button>
                 <button onclick="showRenameFolderModal('{{ folder.name }}')" class="rename-btn"></button>
             </li>
@@ -27,35 +27,35 @@
     </ul>
 
     {% if selected_folder %}
-        <h3>Contenu du dossier : {{ selected_folder }}</h3>
+        <h3>{{ translations.folder_content }}: {{ selected_folder }}</h3>
 
         <form method="post" enctype="multipart/form-data">
             <input type="hidden" name="folder" value="{{ selected_folder }}">
             <input type="file" name="files" multiple required>
-            <button type="submit">Uploader</button>
+            <button type="submit">{{ translations.upload }}</button>
         </form>
 
         <ul id="file-list">
-            {% for file in files %}
-                <li>
-                    <a href="/uploads/{{ selected_folder }}/{{ file.name }}" target="_blank">{{ file.name }} ({{ file.size }})</a>
-                    <img src="/uploads/{{ selected_folder }}/{{ file.name }}" width="100">
-                    <button onclick="deleteFile('{{ selected_folder }}', '{{ file.name }}', this.parentElement)" class="delete-btn"></button>
-                </li>
-            {% endfor %}
         </ul>
     {% endif %}
 
     <div id="renameFolderModal" style="display:none;">
         <form id="rename-form" method="post">
             <input type="hidden" name="old_folder" id="old-folder">
-            <input type="text" name="new_folder" id="new-folder" placeholder="Nouveau nom de dossier" required>
-            <button type="submit">Renommer</button>
-            <button type="button" onclick="closeRenameFolderModal()">Annuler</button>
+            <input type="text" name="new_folder" id="new-folder" placeholder="{{ translations.new_folder_name }}" required>
+            <button type="submit">{{ translations.rename }}</button>
+            <button type="button" onclick="closeRenameFolderModal()">{{ translations.cancel }}</button>
         </form>
     </div>
     <script>
         const selectedFolder = "{{ selected_folder }}";
+        const translations = {
+            deleteConfirm: "{{ translations.delete_confirm }}",
+            deleteFolderConfirm: "{{ translations.delete_folder_confirm }}",
+            error: "{{ translations.error }}",
+            tryAgain: "{{ translations.try_again }}",
+            folderNameEmpty: "{{ translations.folderNameEmpty }}"
+        };
     </script>
 </body>
 </html>

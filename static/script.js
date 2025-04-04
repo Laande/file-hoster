@@ -3,7 +3,7 @@ const filesPerRequest = 10;
 let loading = false;
 
 async function deleteFile(folder, filename, fileElement) {
-    if (confirm("Voulez-vous vraiment supprimer ce fichier ?")) {
+    if (confirm(translations.deleteConfirm)) {
         try {
             const response = await fetch("/delete_file", {
                 method: "POST",
@@ -19,17 +19,17 @@ async function deleteFile(folder, filename, fileElement) {
                 fileElement.remove();
             } else {
                 console.error(result.message);
-                alert("Erreur : " + result.message);
+                alert(translations.error + ": " + result.message);
             }
         } catch (error) {
-            console.error("Erreur lors de la suppression du fichier : ", error);
-            alert("Une erreur est survenue, veuillez réessayer plus tard.");
+            console.error("Error deleting file: ", error);
+            alert(translations.tryAgain);
         }
     }
 }
 
 async function deleteFolder(folder) {
-    if (confirm("Voulez-vous vraiment supprimer ce dossier et tout son contenu ?")) {
+    if (confirm(translations.deleteFolderConfirm)) {
         try {
             const response = await fetch("/delete_folder", {
                 method: "POST",
@@ -44,18 +44,18 @@ async function deleteFolder(folder) {
                 location.reload();
             } else {
                 console.error(result.message);
-                alert("Erreur : " + result.message);
+                alert(translations.error + ": " + result.message);
             }
         } catch (error) {
-            console.error("Erreur lors de la suppression du dossier : ", error);
-            alert("Une erreur est survenue, veuillez réessayer plus tard.");
+            console.error("Error deleting folder: ", error);
+            alert(translations.tryAgain);
         }
     }
 }
 
 async function renameFolder(oldFolder, newFolder) {
     if (!newFolder.trim()) {
-        alert("Le nom du dossier ne peut pas être vide");
+        alert(translations.folderNameEmpty);
         return;
     }
     
@@ -77,11 +77,11 @@ async function renameFolder(oldFolder, newFolder) {
             }
         } else {
             console.error(result.message);
-            alert("Erreur : " + result.message);
+            alert(translations.error + ": " + result.message);
         }
     } catch (error) {
-        console.error("Erreur lors du renommage du dossier : ", error);
-        alert("Une erreur est survenue, veuillez réessayer plus tard.");
+        console.error("Error renaming folder: ", error);
+        alert(translations.tryAgain);
     }
 }
 
