@@ -2,6 +2,10 @@
 
 A simple web-based file management system that allows you to organize, upload, and manage files through a browser interface.
 
+## Preview
+
+![File Hoster Preview](preview.png)
+
 ## ⚠️ SECURITY WARNING ⚠️
 
 **This application is designed for localhost use only!**
