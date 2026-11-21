@@ -2,7 +2,7 @@
 BASE_DIR = "/home/hdd/uploads"
 
 # Server configuration
-HOST = "127.0.0.1"
+HOST = "192.168.1.100"  # LAN only
 PORT = 5000
 
 # Only allow requests from local/private IP addresses (loopback, LAN, link-local)
