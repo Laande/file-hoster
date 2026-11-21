@@ -5,6 +5,9 @@ BASE_DIR = "/home/hdd/uploads"
 HOST = "127.0.0.1"
 PORT = 5000
 
+# Only allow requests from local/private IP addresses (loopback, LAN, link-local)
+LOCAL_ONLY = True
+
 # Number of files to load per request (pagination)
 FILES_PER_REQUEST = 10
 

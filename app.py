@@ -1,7 +1,8 @@
 import os
 import sys
 import shutil
-from flask import Flask, request, render_template, send_from_directory, jsonify, url_for
+import ipaddress
+from flask import Flask, request, render_template, send_from_directory, jsonify, url_for, abort
 
 import conf
 from languages import TRANSLATIONS
@@ -11,6 +12,18 @@ app = Flask(__name__)
 BASE_DIR = conf.BASE_DIR
 os.makedirs(BASE_DIR, exist_ok=True)
 FILES_PER_REQUEST = conf.FILES_PER_REQUEST
+
+
+@app.before_request
+def restrict_to_local_ips():
+    if not conf.LOCAL_ONLY:
+        return
+    try:
+        client_ip = ipaddress.ip_address(request.remote_addr)
+    except ValueError:
+        abort(403)
+    if not (client_ip.is_private or client_ip.is_loopback or client_ip.is_link_local):
+        abort(403)
 
 
 def get_size_format(size_bytes):
